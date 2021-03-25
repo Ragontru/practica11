@@ -12,16 +12,21 @@ export class HomePage implements OnInit {
 
   validations_form: FormGroup;
   genders: Array<string>;
-  matching_passwords_group: FormGroup;
   
   validation_messages = {
     'dni': [
       { type: 'required', message: 'DNI is required.' },
       { type: 'minlength', message: 'DNI must be at least 9 characters long.' },
       { type: 'maxlength', message: 'DNI cannot be more than 9 characters long.' },
-      { type: 'pattern', message: 'Your DNI must contain only numbers and letters, and must ending with a letter.' },
-      { type: 'validDNI', message: 'Your DNI has already been taken.' }
+      { type: 'pattern', message: 'Your DNI must contain only 8 numbers and 1 letter' },
+      { type: 'validDNI', message: 'The letter of your DNI isnt valid for this number.' }
     ],
+    'iban': [
+      { type: 'required', message: 'IBAN is required.' },
+      { type: 'minlength', message: 'IBAN must be at least 24 characters long.' },
+      { type: 'maxlength', message: 'IBAN cannot be more than 24 characters long.' },
+      { type: 'pattern', message: 'Your IBAN isnt valid, it should start with "ES". ' }
+    ]
   };
 
   constructor(
@@ -40,13 +45,11 @@ export class HomePage implements OnInit {
         Validators.required
       ])),
       iban: new FormControl('',Validators.compose([
-        this.validIBAN,
         Validators.maxLength(24),
         Validators.minLength(24),
-        Validators.pattern('ES'),
+        Validators.pattern('ES[0-9]{2}[0-9]{4}[0-9]{4}[0-9]{2}[0-9]{10}'),
         Validators.required
       ]))
-      
     })
   }
 
@@ -63,18 +66,17 @@ export class HomePage implements OnInit {
 
   validDNI(fc: FormControl) {
 
-    var numero
-    var letra
-    var letraC
+    var numeros = fc.value.substring(0,fc.value.length-1);
+    var numero = numeros % 23;
+    var letrasValidas = "TRWAGMYFPDXBNJZSQVHLCKE";
+    var letraCorr = letrasValidas.charAt(numero);
+    var letra = fc.value.substring(8, 9);
 
-    if (fc.value.toLowerCase() === "abc123" || fc.value.toLowerCase() === "cba321") {
+    if (letraCorr != letra) {
       return ({ validDNI: true });
     } else {
       return (null);
     }
-  }
-
-  validIBAN(fc: FormControl){
 
   }
 
